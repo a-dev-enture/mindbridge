@@ -1,0 +1,43 @@
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  text-align: center;
+  background: #e0f7fa;
+}
+
+h1 {
+  margin-top: 30px;
+  color: #00838f;
+}
+
+#bubble-wrap {
+  display: grid;
+  grid-template-columns: repeat(10, 40px);
+  grid-gap: 8px;
+  justify-content: center;
+  margin-top: 40px;
+}
+
+.bubble {
+  width: 40px;
+  height: 40px;
+  background: radial-gradient(circle, #fff 60%, #b2ebf2 100%);
+  border-radius: 50%;
+  border: 2px solid #4dd0e1;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s;
+  position: relative;
+}
+
+.bubble.popped {
+  background: #bdbdbd;
+  box-shadow: none;
+  cursor: default;
+  border: 2px solid #757575;
+  opacity: 0.7;
+}
+
+.bubble:active:not(.popped) {
+  background: #b2ebf2;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
