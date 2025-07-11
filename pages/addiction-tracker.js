@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import NavBar from '../components/NavBar';
 
@@ -13,15 +12,14 @@ export default function AddictionTracker() {
   // Load addictions from API
   useEffect(() => {
     fetchAddictions();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Add real-time timer to update the counters every second
+  // Real-time timer to update counters every second
   useEffect(() => {
     const interval = setInterval(() => {
-      // Force re-render to update time calculations
       setAddictions(prevAddictions => [...prevAddictions]);
     }, 1000);
-
     return () => clearInterval(interval);
   }, []);
 
@@ -30,9 +28,9 @@ export default function AddictionTracker() {
       const response = await fetch(API_BASE);
       if (response.ok) {
         const data = await response.json();
-        // Convert backend data format to frontend format
+        // Use a stable id (name) for addiction items
         const addictionList = Object.entries(data).map(([name, startDate]) => ({
-          id: Date.now() + Math.random(),
+          id: name,
           name,
           startDate
         }));
@@ -62,27 +60,24 @@ export default function AddictionTracker() {
   // Add new addiction
   const handleAddAddiction = async () => {
     if (!newAddiction.trim()) return;
-    
+    const trimmed = newAddiction.trim();
+    // Prevent duplicates
+    if (addictions.some(a => a.name.toLowerCase() === trimmed.toLowerCase())) {
+      alert("This addiction is already being tracked.");
+      return;
+    }
     try {
       const startDate = new Date().toISOString();
       const response = await fetch(API_BASE, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          [newAddiction.trim()]: startDate
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ [trimmed]: startDate }),
       });
-
       if (response.ok) {
-        const newEntry = {
-          id: Date.now(),
-          name: newAddiction.trim(),
-          startDate: startDate,
-        };
-        
-        setAddictions([...addictions, newEntry]);
+        setAddictions([
+          ...addictions,
+          { id: trimmed, name: trimmed, startDate }
+        ]);
         setNewAddiction("");
         setShowForm(false);
       }
@@ -99,16 +94,11 @@ export default function AddictionTracker() {
     try {
       const response = await fetch(API_BASE, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          [addiction.name]: null // This will delete the field
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ [addiction.name]: null }),
       });
-
       if (response.ok) {
-        setAddictions(addictions.filter(addiction => addiction.id !== id));
+        setAddictions(addictions.filter(a => a.id !== id));
       }
     } catch (error) {
       console.error('Error deleting addiction:', error);
@@ -124,19 +114,12 @@ export default function AddictionTracker() {
       const newStartDate = new Date().toISOString();
       const response = await fetch(API_BASE, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          [addiction.name]: newStartDate
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ [addiction.name]: newStartDate }),
       });
-
       if (response.ok) {
-        setAddictions(addictions.map(addiction => 
-          addiction.id === id 
-            ? { ...addiction, startDate: newStartDate }
-            : addiction
+        setAddictions(addictions.map(a => 
+          a.id === id ? { ...a, startDate: newStartDate } : a
         ));
       }
     } catch (error) {
@@ -185,6 +168,7 @@ export default function AddictionTracker() {
             Addiction Tracker
           </h1>
           <button
+            type="button"
             onClick={() => setShowForm(true)}
             style={{
               width: "60px",
@@ -201,13 +185,13 @@ export default function AddictionTracker() {
               alignItems: "center",
               justifyContent: "center"
             }}
-            onMouseOver={(e) => {
-              e.target.style.transform = "scale(1.1)";
-              e.target.style.boxShadow = "0 6px 20px rgba(0,0,0,0.4)";
+            onMouseOver={e => {
+              e.currentTarget.style.transform = "scale(1.1)";
+              e.currentTarget.style.boxShadow = "0 6px 20px rgba(0,0,0,0.4)";
             }}
-            onMouseOut={(e) => {
-              e.target.style.transform = "scale(1)";
-              e.target.style.boxShadow = "0 4px 15px rgba(0,0,0,0.3)";
+            onMouseOut={e => {
+              e.currentTarget.style.transform = "scale(1)";
+              e.currentTarget.style.boxShadow = "0 4px 15px rgba(0,0,0,0.3)";
             }}
           >
             +
@@ -235,7 +219,7 @@ export default function AddictionTracker() {
               <input
                 type="text"
                 value={newAddiction}
-                onChange={(e) => setNewAddiction(e.target.value)}
+                onChange={e => setNewAddiction(e.target.value)}
                 placeholder="Enter addiction name (e.g., Smoking, Social Media, etc.)"
                 style={{
                   flex: 1,
@@ -246,11 +230,12 @@ export default function AddictionTracker() {
                   outline: "none",
                   transition: "border-color 0.3s ease"
                 }}
-                onFocus={(e) => e.target.style.borderColor = "#667eea"}
-                onBlur={(e) => e.target.style.borderColor = "#ddd"}
-                onKeyPress={(e) => e.key === 'Enter' && handleAddAddiction()}
+                onFocus={e => e.target.style.borderColor = "#667eea"}
+                onBlur={e => e.target.style.borderColor = "#ddd"}
+                onKeyDown={e => e.key === 'Enter' && handleAddAddiction()}
               />
               <button
+                type="button"
                 onClick={handleAddAddiction}
                 style={{
                   padding: "12px 25px",
@@ -263,12 +248,13 @@ export default function AddictionTracker() {
                   fontWeight: "bold",
                   transition: "all 0.3s ease"
                 }}
-                onMouseOver={(e) => e.target.style.transform = "translateY(-2px)"}
-                onMouseOut={(e) => e.target.style.transform = "translateY(0)"}
+                onMouseOver={e => e.currentTarget.style.transform = "translateY(-2px)"}
+                onMouseOut={e => e.currentTarget.style.transform = "translateY(0)"}
               >
                 Add Addiction
               </button>
               <button
+                type="button"
                 onClick={() => setShowForm(false)}
                 style={{
                   padding: "12px 20px",
@@ -280,13 +266,13 @@ export default function AddictionTracker() {
                   cursor: "pointer",
                   transition: "all 0.3s ease"
                 }}
-                onMouseOver={(e) => {
-                  e.target.style.borderColor = "#999";
-                  e.target.style.color = "#333";
+                onMouseOver={e => {
+                  e.currentTarget.style.borderColor = "#999";
+                  e.currentTarget.style.color = "#333";
                 }}
-                onMouseOut={(e) => {
-                  e.target.style.borderColor = "#ddd";
-                  e.target.style.color = "#666";
+                onMouseOut={e => {
+                  e.currentTarget.style.borderColor = "#ddd";
+                  e.currentTarget.style.color = "#666";
                 }}
               >
                 Cancel
@@ -339,8 +325,8 @@ export default function AddictionTracker() {
                       transition: "transform 0.3s ease",
                       cursor: "pointer"
                     }}
-                    onMouseOver={(e) => e.target.style.transform = "translateY(-5px)"}
-                    onMouseOut={(e) => e.target.style.transform = "translateY(0)"}
+                    onMouseOver={e => e.currentTarget.style.transform = "translateY(-5px)"}
+                    onMouseOut={e => e.currentTarget.style.transform = "translateY(0)"}
                   >
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "15px" }}>
                       <h3 style={{ 
@@ -352,6 +338,7 @@ export default function AddictionTracker() {
                         {addiction.name}
                       </h3>
                       <button
+                        type="button"
                         onClick={() => handleDeleteAddiction(addiction.id)}
                         style={{
                           background: "none",
@@ -363,8 +350,8 @@ export default function AddictionTracker() {
                           borderRadius: "5px",
                           transition: "background-color 0.3s ease"
                         }}
-                        onMouseOver={(e) => e.target.style.backgroundColor = "#ffe6e6"}
-                        onMouseOut={(e) => e.target.style.backgroundColor = "transparent"}
+                        onMouseOver={e => e.currentTarget.style.backgroundColor = "#ffe6e6"}
+                        onMouseOut={e => e.currentTarget.style.backgroundColor = "transparent"}
                         title="Delete addiction"
                       >
                         ×
@@ -414,6 +401,7 @@ export default function AddictionTracker() {
                     </div>
                     
                     <button
+                      type="button"
                       onClick={() => handleResetAddiction(addiction.id)}
                       style={{
                         width: "100%",
@@ -427,8 +415,8 @@ export default function AddictionTracker() {
                         fontWeight: "bold",
                         transition: "all 0.3s ease"
                       }}
-                      onMouseOver={(e) => e.target.style.transform = "translateY(-2px)"}
-                      onMouseOut={(e) => e.target.style.transform = "translateY(0)"}
+                      onMouseOver={e => e.currentTarget.style.transform = "translateY(-2px)"}
+                      onMouseOut={e => e.currentTarget.style.transform = "translateY(0)"}
                     >
                       Reset Timer
                     </button>
