@@ -1,4 +1,5 @@
 import NavBar from "../components/NavBar";
+import Image from "next/image";
 
 export default function Home() {
   return (
@@ -14,9 +15,11 @@ export default function Home() {
         background: "#fff",
         padding: "60px 0 40px 0"
       }}>
-        <img
-          src="/hero-image.png" // Place your main hero image in /public
+        <Image
+          src="/hero-image.png"
           alt="Mindful Journey Preview"
+          width={900}
+          height={400}
           style={{
             maxWidth: 900,
             width: "100%",
@@ -113,7 +116,7 @@ export default function Home() {
               color: "#26384a",
               margin: "18px 0 32px 0"
             }}>
-              At MindBridge, we're here to help you navigate the complexities of mental health. Our resources and support are designed to empower you on your journey to well-being, providing understanding and practical solutions for mental health challenges.
+              At MindBridge, we&apos;re here to help you navigate the complexities of mental health. Our resources and support are designed to empower you on your journey to well-being, providing understanding and practical solutions for mental health challenges.
             </p>
             <button style={{
               padding: "12px 44px",
@@ -129,9 +132,11 @@ export default function Home() {
               Learn more.
             </button>
           </div>
-          <img
+          <Image
             src="/mental-health-illustration.png"
             alt="Mental Health Illustration"
+            width={410}
+            height={300}
             style={{
               maxWidth: 410,
               width: "100%",
@@ -155,7 +160,7 @@ export default function Home() {
           fontWeight: 700,
           color: "#183C57",
           marginBottom: "1.5rem"
-        }}>We'd love your feedback!</h2>
+        }}>We&apos;d love your feedback!</h2>
         <p style={{
           fontSize: "1.15rem",
           color: "#444",
@@ -203,7 +208,7 @@ function FeatureCard({ title, desc, img, href }) {
       border: "1px solid #e5e7eb"
     }}>
       {img && (
-        <img src={img} alt={title} style={{ width: 54, height: 54, marginBottom: 18 }} />
+        <Image src={img} alt={title} width={54} height={54} style={{ marginBottom: 18 }} />
       )}
       <h3 style={{
         fontSize: "1.15rem",
