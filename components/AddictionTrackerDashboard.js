@@ -5,13 +5,19 @@ export default function AddictionTrackerDashboard() {
   const [showForm, setShowForm] = useState(false);
   const [newAddiction, setNewAddiction] = useState("");
 
+  // Load addictions from localStorage once safely for SSR
   useEffect(() => {
-    const saved = JSON.parse(localStorage.getItem("addictions") || "[]");
-    setAddictions(saved);
+    if (typeof window !== "undefined") {
+      const saved = JSON.parse(localStorage.getItem("addictions") || "[]");
+      setAddictions(saved);
+    }
   }, []);
 
+  // Save addictions to localStorage when changed
   useEffect(() => {
-    localStorage.setItem("addictions", JSON.stringify(addictions));
+    if (typeof window !== "undefined") {
+      localStorage.setItem("addictions", JSON.stringify(addictions));
+    }
   }, [addictions]);
 
   const handleAdd = () => {
@@ -38,6 +44,7 @@ export default function AddictionTrackerDashboard() {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold text-gray-800">Addiction Tracker</h1>
         <button
+          type="button"
           onClick={() => setShowForm(true)}
           className="text-white bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-full text-2xl shadow"
         >
@@ -54,6 +61,7 @@ export default function AddictionTrackerDashboard() {
             className="w-full border rounded p-2 mb-2"
           />
           <button
+            type="button"
             onClick={handleAdd}
             className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
           >
@@ -78,5 +86,5 @@ export default function AddictionTrackerDashboard() {
     </div>
   );
 }
-
-
+   
+         
