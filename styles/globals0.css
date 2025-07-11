@@ -1,0 +1,13 @@
+/* styles/globals.css */
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* For sticky NavBar (if you want) */
+.sticky-navbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: #f6f7f9; /* Match your navbar's background */
+}
